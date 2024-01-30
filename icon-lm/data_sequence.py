@@ -146,50 +146,6 @@ def apply_cond_qoi_len_in_use(config, this_config,
   return new_demo_cond_mask_list, new_demo_qoi_mask_list, new_quest_cond_mask_list, new_quest_qoi_mask_list
 
 
-def build_pde_mask(equation, demo_cond_k, demo_cond_v, demo_qoi_k, demo_qoi_v,
-                      quest_cond_k, quest_cond_v, quest_qoi_k, quest_qoi_v, 
-                      config, this_config):
-
-  demo_start_ind = tf_rng_seq.uniform(shape = (config['demo_num'],), 
-                                minval = this_config['start_ind_begin'], 
-                                maxval = this_config['start_ind_end'], dtype = tf.int32)
-  demo_max_ind = config['demo_cond_len'] + config['demo_qoi_len']
-  demo_cond_k_list = []
-  demo_cond_v_list = []
-  demo_qoi_k_list = []
-  demo_qoi_v_list = []
-  for i in range(config['demo_num']):
-    demo_start_ind_i = demo_start_ind[i]
-    demo_end_ind_i = demo_start_ind_i + config['demo_qoi_len']
-    demo_cond_k_list.append(tf.concat([demo_cond_k[i, 0:demo_start_ind_i, :], demo_cond_k[i, demo_end_ind_i:demo_max_ind, :]], axis = 0))
-    demo_cond_v_list.append(tf.concat([demo_cond_v[i, 0:demo_start_ind_i, :], demo_cond_v[i, demo_end_ind_i:demo_max_ind, :]], axis = 0))
-    demo_qoi_k_list.append(demo_qoi_k[i, demo_start_ind_i:demo_end_ind_i, :])
-    demo_qoi_v_list.append(demo_qoi_v[i, demo_start_ind_i:demo_end_ind_i, :])
-
-  quest_start_ind = tf_rng_seq.uniform(shape = (config['quest_num'],),
-                                minval = this_config['start_ind_begin'],
-                                maxval = this_config['start_ind_end'], dtype = tf.int32)
-  quest_max_ind = config['quest_cond_len'] + config['quest_qoi_len']
-  quest_cond_k_list = []
-  quest_cond_v_list = []
-  quest_qoi_k_list = []
-  quest_qoi_v_list = []
-  for i in range(config['quest_num']):
-    quest_start_ind_i = quest_start_ind[i]
-    quest_end_ind_i = quest_start_ind_i + config['quest_qoi_len']
-    quest_cond_k_list.append(tf.concat([quest_cond_k[i, 0:quest_start_ind_i, :], quest_cond_k[i, quest_end_ind_i:quest_max_ind, :]], axis = 0))
-    quest_cond_v_list.append(tf.concat([quest_cond_v[i, 0:quest_start_ind_i, :], quest_cond_v[i, quest_end_ind_i:quest_max_ind, :]], axis = 0))
-    quest_qoi_k_list.append(quest_qoi_k[i, quest_start_ind_i:quest_end_ind_i, :])
-    quest_qoi_v_list.append(quest_qoi_v[i, quest_start_ind_i:quest_end_ind_i, :])
-
-
-  demo_cond_mask_list, demo_qoi_mask_list, quest_cond_mask_list, quest_qoi_mask_list = apply_cond_qoi_len_in_use(config, this_config)
-  demo_cond_mask_list, demo_qoi_mask_list = apply_random_demo_num_in_use(config, this_config, demo_cond_mask_list, demo_qoi_mask_list)
-  return equation, demo_cond_k_list, demo_cond_v_list, demo_qoi_k_list, demo_qoi_v_list, \
-                  quest_cond_k_list, quest_cond_v_list, quest_qoi_k_list, quest_qoi_v_list, \
-                  demo_cond_mask_list, demo_qoi_mask_list, quest_cond_mask_list, quest_qoi_mask_list
-
-
 
 def build_ode_forward(equation, demo_cond_k, demo_cond_v, demo_qoi_k, demo_qoi_v,
                           quest_cond_k, quest_cond_v, quest_qoi_k, quest_qoi_v, 

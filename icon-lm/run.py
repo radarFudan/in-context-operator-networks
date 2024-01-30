@@ -174,6 +174,13 @@ def run_train():
                     trainable_mode = FLAGS.trainable_mode,
                     loss_mode = FLAGS.loss_mode,
                     )
+  elif FLAGS.model in ['deepo','fno']:
+    from runner_deepo_torch import Runner
+    runner = Runner(data, model_config, opt_config = opt_config, 
+                    model_name = FLAGS.model, pretrained = FLAGS.pretrained, 
+                    trainable_mode = FLAGS.trainable_mode,
+                    loss_mode = FLAGS.loss_mode,
+                    )
   else:
     raise ValueError("model {} not supported".format(FLAGS.model))
 
@@ -304,8 +311,8 @@ if __name__ == '__main__':
 
   flags.DEFINE_boolean('deterministic', True, 'deterministic mode')
   
-  flags.DEFINE_string('user', 'yl', 'user name, used for saving results and check points')
-  flags.DEFINE_string('problem', 'test', 'problem')
+  flags.DEFINE_string('user', 'user', 'user name, used for saving results and check points')
+  flags.DEFINE_string('problem', 'test', 'folder for storing the model checkpoints and tensorboard logs')
   flags.DEFINE_enum('backend', 'jax', ['jax','torch'], 'backend of runner')
 
   flags.DEFINE_integer('seed', 42, 'random seed')
@@ -323,7 +330,7 @@ if __name__ == '__main__':
   flags.DEFINE_list('test_data_dirs', None, 'directories of testing data')
   flags.DEFINE_list('test_data_globs', ['test*'], 'filename glob patterns of testing data')
   flags.DEFINE_string('test_config_filename', 'test_config.json', 'config file for testing')
-  flags.DEFINE_list('test_demo_num_list', [0,1,5], 'demo number list for testing')
+  flags.DEFINE_list('test_demo_num_list', [0,1,3,5], 'demo number list for testing')
   flags.DEFINE_list('test_caption_id_list', [-1,], 'caption id list for testing')
 
   flags.DEFINE_string('model', 'icon', 'model name')

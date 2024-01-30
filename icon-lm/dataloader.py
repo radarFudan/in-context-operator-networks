@@ -256,13 +256,7 @@ def build_sequence(raw, equation, caption, input_id, embedding_raw, embedding_po
     quest_qoi_v: list of [qoi_len, v_dim]
     quest_qoi_mask: list of [qoi_len]
   '''
-  if tf.strings.regex_full_match(equation, "pde.*mask.*"):
-    build_fn = data_sequence.build_pde_mask
-    this_config = config['pde_mask']
-    out = build_fn(equation, demo_cond_k, demo_cond_v, demo_qoi_k, demo_qoi_v,
-                  quest_cond_k, quest_cond_v, quest_qoi_k, quest_qoi_v, 
-                  config, this_config)
-  elif tf.strings.regex_full_match(equation, "pde.*spatial_forward.*"): 
+  if tf.strings.regex_full_match(equation, "pde.*spatial_forward.*"): 
     build_fn = data_sequence.build_pde_spatial_forward
     this_config = config['pde_spatial_forward']
     out = build_fn(equation, demo_cond_k, demo_cond_v, demo_qoi_k, demo_qoi_v,
@@ -605,7 +599,8 @@ class DataProvider():
       return equation, caption, data, label
 
 def split_data(caption, data, demo_num_list, caption_id_list = (-1,)):
-  # caption_id_list is just a counter. This function mainly splits examples
+  # This function mainly splits examples
+  # caption_id_list is just a counter, only its length matters
   for demo_num in demo_num_list:
     for ci in caption_id_list:
       new_data = data._replace(demo_cond_k = data.demo_cond_k[..., :demo_num, :, :],

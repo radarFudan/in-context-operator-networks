@@ -176,7 +176,7 @@ class IconGPTModel(nn.Module):
 
 
 
-def build_network_fn(data, key, config, return_model = False, compact = True):
+def build_network_fn(data, key, config, return_model = False, compact = True, print_model = True):
   config = freeze(config)
   data = tree.tree_map(lambda x: x[0,0], data) # take off device and batch dimension
   data_shape = tree.tree_map(lambda x: x.shape, data)
@@ -192,7 +192,8 @@ def build_network_fn(data, key, config, return_model = False, compact = True):
   subkey1, subkey2 = jax.random.split(key, 2)
   rngs = {'params': subkey1, 'dropout': subkey2}
   params = model.init(rngs, data)
-  print(utils.strip_ansi_codes(model.tabulate(rngs, data)))
+  if print_model:
+    print(utils.strip_ansi_codes(model.tabulate(rngs, data)))
 
   @jax.jit
   def forward_with_caption_fn(params, rng_key, data):

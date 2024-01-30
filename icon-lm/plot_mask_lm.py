@@ -83,7 +83,7 @@ def plot_mask(mask, cond_len_list, qoi_kv_len_list, qoi_k_len_list, caption_len)
         plt.plot([cursor-0.5, cursor + qoi_kv_len_list[i]-0.5], [pos, pos], color = '#75F5B3', lw = lw_b, ls = '-', solid_capstyle='butt'); cursor += qoi_kv_len_list[i]
       if qoi_k_len_list[i] > 0:
         plt.plot([cursor-0.5, cursor + qoi_k_len_list[i]-0.5], [pos, pos], color = '#FF8000', lw = lw_b, ls = '-', solid_capstyle='butt'); cursor += qoi_k_len_list[i]
-
+  plt.tight_layout()
   return fig
 
 

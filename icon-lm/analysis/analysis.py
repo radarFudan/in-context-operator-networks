@@ -126,9 +126,26 @@ def write_into_dict(result_dict, task, runner, equation, all_caption, all_data, 
       append_dict_list(result_dict, (*eqn_key, 'cond_mask'), all_data_flat.quest_cond_mask[i,0])
       append_dict_list(result_dict, (*eqn_key, 'qoi_k'), all_data_flat.quest_qoi_k[i,0])
 
-  # write error into dict
+  if 'demo' in FLAGS.write:
+    for i in range(label_flat.shape[0]):
+      eqn_key = get_key(task, equation[i])
+      append_dict_list(result_dict, (*eqn_key, 'demo_cond_k'), all_data_flat.demo_cond_k[i])
+      append_dict_list(result_dict, (*eqn_key, 'demo_cond_v'), all_data_flat.demo_cond_v[i])
+      append_dict_list(result_dict, (*eqn_key, 'demo_cond_mask'), all_data_flat.demo_cond_mask[i])
+      append_dict_list(result_dict, (*eqn_key, 'demo_qoi_k'), all_data_flat.demo_qoi_k[i])
+      append_dict_list(result_dict, (*eqn_key, 'demo_qoi_v'), all_data_flat.demo_qoi_v[i])
+      append_dict_list(result_dict, (*eqn_key, 'demo_qoi_mask'), all_data_flat.demo_qoi_mask[i])
+
+  if 'equation' in FLAGS.write:
+    for i in range(label_flat.shape[0]):
+      eqn_key = get_key(task, equation[i])
+      append_dict_list(result_dict, (*eqn_key, 'equation'), equation[i])
+
+  # write error into dict, test_caption_id_list_in_use = [-1] or [0] or [-1,0]
+  
+  # -1 indicates no caption
   if -1 in test_caption_id_list_in_use:
-    test_caption_id_list_in_use.remove(-1)
+    test_caption_id_list_in_use.remove(-1) # remove -1 from the list
     for demo_num, caption_id, caption, data in split_data(all_caption, all_data, test_demo_num_list, [0]):    
       this_error, this_pred = runner.get_error(data, label, with_caption = False, return_pred = True)
       if FLAGS.backend == 'jax':
@@ -139,7 +156,7 @@ def write_into_dict(result_dict, task, runner, equation, all_caption, all_data, 
         append_dict_list(result_dict, (*eqn_key, 'error', demo_num, -1), this_error[i]) # -1 means no caption
         append_dict_list(result_dict, (*eqn_key, 'pred', demo_num, -1), this_pred[i])
 
-  
+  # count len(test_caption_id_list_in_use other than -1), usually 0 or 1
   for demo_num, caption_id, caption, data in split_data(all_caption, all_data, test_demo_num_list, test_caption_id_list_in_use):    
     this_error, this_pred = runner.get_error(data, label, with_caption = True, return_pred = True)
     if FLAGS.backend == 'jax':
@@ -283,7 +300,11 @@ def main(argv):
 
   print("")
   for key, value in result_dict.items():
-    print(key, value.shape, np.mean(value), np.std(value), flush=True)
+    print(key, value.shape, end = ", ", flush=True)
+    try:
+      print(np.mean(value), np.std(value), flush=True)
+    except:
+      print("", flush=True)
 
   if not os.path.exists(FLAGS.analysis_dir):
     os.makedirs(FLAGS.analysis_dir)
@@ -292,6 +313,21 @@ def main(argv):
 
   print("result_dict saved to {}".format(FLAGS.analysis_dir), flush=True)
 
+  if 'weno' in FLAGS.task:
+    import analysis_weno_aug
+    if FLAGS.task == 'weno_quadratic':
+      eqn_name = 'conservation_weno_quadratic_backward'
+      analysis_weno_aug.write_quadratic_consistency_error(FLAGS.analysis_dir, eqn_name)
+    elif FLAGS.task == 'weno_cubic':
+      eqn_name = 'conservation_weno_cubic_backward'
+      analysis_weno_aug.write_cubic_consistency_error(FLAGS.analysis_dir, eqn_name)
+    elif FLAGS.task == 'weno_sin':
+      eqn_name = 'conservation_weno_sin_backward'
+      analysis_weno_aug.write_sin_consistency_error(FLAGS.analysis_dir, eqn_name)
+    else:
+      raise ValueError("task {} not supported".format(FLAGS.task))
+  else:
+    pass
 
 if __name__ == '__main__':
 
@@ -317,7 +353,7 @@ if __name__ == '__main__':
   flags.DEFINE_string('model_config_filename', '../config_model/model_gpt2_config.json', 'config file for model')
   flags.DEFINE_string('analysis_dir', '/home/shared/icon/analysis/icon_gpt2_20230921-003808', 'write file to dir')
   flags.DEFINE_string('results_name', '', 'additional file name for results')
-  flags.DEFINE_string('restore_dir', '/home/shared/icon/save/yl/ckpts/icon_gpt2/20230921-003808', 'restore directory')
+  flags.DEFINE_string('restore_dir', '/home/shared/icon/save/user/ckpts/icon_gpt2/20230921-003808', 'restore directory')
   flags.DEFINE_integer('restore_step', 1000000, 'restore step')
 
 
