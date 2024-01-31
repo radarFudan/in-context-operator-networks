@@ -1,6 +1,9 @@
 # ICON-LM for Multi-Modal In-Context Operator Learning
 
-This folder contains the code associated with the paper titled "Fine-Tune Language Models as Multi-Modal Differential Equation Solvers"
+This folder contains the code associated with the following two papers: 
+- [Fine-Tune Language Models as Multi-Modal Differential Equation Solvers](https://arxiv.org/pdf/2308.05061.pdf). This paper focuses on improving the model architecture and training scheme for in-context operator learning.
+
+- [PDE Generalization of In-Context Operator Networks: A Study on 1D Scalar Nonlinear Conservation Laws](https://arxiv.org/pdf/2401.07364.pdf). This paper focuses on solving PDE problems with in-context operator learning, espetially its generalization capability to new PDEs.
 
 ## Environment Setup
 
